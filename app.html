@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- 引入撒花特效庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --oed-bg: #020d1d;
@@ -39,7 +41,6 @@
             overflow-x: hidden;
         }
 
-        /* OED 特有左側詞源光束藝術底板 */
         .oed-burst-bg {
             position: fixed;
             top: 0;
@@ -71,7 +72,6 @@
             padding: 40px 20px;
         }
 
-        /* 標頭區域 - 原汁原味 OED 官網質感 */
         header {
             text-align: center;
             margin-bottom: 32px;
@@ -117,7 +117,6 @@
             font-style: italic;
         }
 
-        /* 玻璃擬態高質感卡片容器 */
         .glass-panel {
             background: var(--oed-panel);
             backdrop-filter: blur(16px);
@@ -444,7 +443,6 @@
     <svg class="oed-burst-svg" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="200" cy="300" r="140" stroke="#061833" stroke-width="40"/>
         <g opacity="0.6">
-            <!-- 輻射狀線條模擬 OED 時間軸 -->
             <line x1="200" y1="300" x2="420" y2="120" stroke="#f43f5e" stroke-width="2.5" />
             <line x1="200" y1="300" x2="480" y2="200" stroke="#fb7185" stroke-width="1.5" />
             <line x1="200" y1="300" x2="520" y2="300" stroke="#e879f9" stroke-width="3" />
@@ -452,7 +450,6 @@
             <line x1="200" y1="300" x2="430" y2="460" stroke="#818cf8" stroke-width="1" />
             <line x1="200" y1="300" x2="350" y2="520" stroke="#f43f5e" stroke-width="2" />
             
-            <!-- 多層密集發散線段 -->
             <circle cx="200" cy="300" r="180" stroke="#fb7185" stroke-width="1" stroke-dasharray="2 10" />
             <circle cx="200" cy="300" r="220" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 14" />
             <circle cx="200" cy="300" r="260" stroke="#ffffff" stroke-width="0.8" opacity="0.3" stroke-dasharray="1 8" />
@@ -524,7 +521,6 @@
 </div>
 
 <script>
-    // 艾賓浩斯記憶時間間隔 (毫秒)
     const EBBINGHAUS_INTERVALS = [
         0,                        
         12 * 60 * 60 * 1000,      // 12小時
@@ -536,21 +532,32 @@
         30 * 24 * 60 * 60 * 1000  // 30天
     ];
 
-    // Web Audio API 高端學術微音效合成器 (Oxford Academic Chimes)
     let audioCtx = null;
     function getAudioCtx() {
         if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
         return audioCtx;
     }
 
-    // 正確音效：典雅的水晶磬音 / 雙音清脆和弦 (E5 -> A5)
+    // 修復 iPhone 休眠/鎖屏後音頻消失的問題 (全域觸控解鎖機制)
+    function unlockAudio() {
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+    document.addEventListener('touchstart', unlockAudio, { passive: true });
+    document.addEventListener('click', unlockAudio, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    });
+
     function playCorrectFx() {
         try {
             const ctx = getAudioCtx();
+            if (ctx.state === 'suspended') ctx.resume();
             const now = ctx.currentTime;
 
-            // 第一音 E5 (659.25Hz)
             const osc1 = ctx.createOscillator();
             const gain1 = ctx.createGain();
             osc1.type = 'sine';
@@ -562,7 +569,6 @@
             osc1.start(now);
             osc1.stop(now + 0.6);
 
-            // 第二音 A5 (880.00Hz) - 延遲0.08秒觸發
             const osc2 = ctx.createOscillator();
             const gain2 = ctx.createGain();
             osc2.type = 'sine';
@@ -576,15 +582,15 @@
         } catch(e) {}
     }
 
-    // 錯誤音效：沉穩溫和的大提琴/木琴低音重音 (F3, 174.61Hz)，非打擊感，不刺耳
     function playWrongFx() {
         try {
             const ctx = getAudioCtx();
+            if (ctx.state === 'suspended') ctx.resume();
             const now = ctx.currentTime;
 
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-            osc.type = 'triangle'; // 三角波，音色沉穩如大提琴
+            osc.type = 'triangle';
             osc.frequency.setValueAtTime(174.61, now); 
             gain.gain.setValueAtTime(0.15, now);
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
@@ -656,6 +662,7 @@
     let allWords = [];
     let currentUnitWords = [];
     let playQueue = [];
+    let currentRoundMistakes = []; // 新增：淘汰制錯題池
     let unitSize = 50;
     let currentUnitIndex = 0;
     let currentQuestionIndex = 0;
@@ -717,6 +724,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+        getAudioCtx(); // 初始化
         const savedWords = localStorage.getItem('oed_app_words');
         if (savedWords) {
             try {
@@ -854,6 +862,7 @@
         } else {
             playQueue = [...currentUnitWords];
         }
+        currentRoundMistakes = []; // 每次重置單元時清空錯題池
         if (currentQuestionIndex >= playQueue.length) currentQuestionIndex = 0;
     }
 
@@ -867,14 +876,7 @@
 
     function nextQuestion() {
         stopAudioLoop();
-        if (playQueue.length === 0) {
-            document.getElementById('cardArea').innerHTML = `
-                <div style="padding: 40px; font-size: 18px; color: #4ade80;">
-                    🎉 當前單元之詞彙已完成研習。
-                </div>
-            `;
-            return;
-        }
+        if (playQueue.length === 0) return;
 
         let wordObj = playQueue[currentQuestionIndex % playQueue.length];
         let distractors = [];
@@ -955,6 +957,11 @@
             }
         } else {
             streakCount = 0;
+            // 加入錯題池，以供本輪結尾重新提問 (淘汰制)
+            if (!currentRoundMistakes.some(w => w.word === wordObj.word)) {
+                currentRoundMistakes.push(wordObj);
+            }
+
             if (mistakeDict[wordObj.word]) {
                 mistakeDict[wordObj.word].level = 0;
                 mistakeDict[wordObj.word].nextReview = Date.now();
@@ -978,7 +985,7 @@
         unitPracticedCount++;
         
         if (selectedIdx === q.correctIndex) {
-            playCorrectFx(); // 觸發牛津學術音效
+            playCorrectFx(); 
             document.getElementById(`optBtn_${q.correctIndex}`).classList.add('correct');
             handleEbbinghausResult(q.wordObj, true);
 
@@ -989,7 +996,7 @@
                 <div><b>${escapeHtml(q.wordObj.word)}</b> ${escapeHtml(q.wordObj.phonetic || '')}：${escapeHtml(q.wordObj.translation)}</div>
             `;
         } else {
-            playWrongFx(); // 觸發牛津學術音效
+            playWrongFx(); 
             document.getElementById(`optBtn_${selectedIdx}`).classList.add('wrong');
             document.getElementById(`optBtn_${q.correctIndex}`).classList.add('correct');
 
@@ -1008,14 +1015,65 @@
         saveState();
     }
 
+    function showCelebration() {
+        // 華麗撒花特效
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#d4af37', '#38bdf8', '#ffffff']
+        });
+        
+        document.getElementById('cardArea').innerHTML = `
+            <div style="padding: 40px 10px; text-align: center; animation: fadeIn 0.5s;">
+                <div style="font-size: 60px; margin-bottom: 20px;">🎉</div>
+                <h2 style="color: var(--oed-gold); font-family: 'EB Garamond', serif; font-size: 32px; margin-bottom: 16px;">Unit Mastered!</h2>
+                <p style="color: #4ade80; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">
+                    太棒了！本階段的詞彙已全數通關！<br>
+                    沒有任何遺漏的生詞了。
+                </p>
+                <button class="next-btn" style="background: rgba(56, 189, 248, 0.1); border-color: var(--oed-blue-accent); color: var(--oed-blue-accent);" onclick="onUnitChange()">
+                    🔄 再次研習本單元
+                </button>
+                <button class="next-btn" style="margin-top: 12px; background: #ffffff; color: #020d1d;" onclick="goToNextUnit()">
+                    ➡️ 前往下一單元
+                </button>
+            </div>
+        `;
+    }
+
+    function goToNextUnit() {
+        const select = document.getElementById('unitSelect');
+        let nextVal = parseInt(select.value) + 1;
+        // 如果到了最後一課（減2是因為有隨機和生詞本選項）
+        if (nextVal >= select.options.length - 2) { 
+            nextVal = 0; // 回到第一課
+        }
+        select.value = nextVal;
+        onUnitChange();
+    }
+
     function onNextClick() {
         currentQuestionIndex++;
+        // 檢查是否已完成當前隊列
         if (currentQuestionIndex >= playQueue.length) {
+            // 如果生詞簿研習模式結束
             if (currentUnitIndex === -2) {
                 loadUnit(-2);
                 return;
             } else {
-                resetUnitQueue();
+                // 一般單元模式：檢查錯題池
+                if (currentRoundMistakes.length > 0) {
+                    // 有錯題！進入錯題循環模式
+                    playQueue = [...currentRoundMistakes];
+                    if (isShuffle) playQueue.sort(() => Math.random() - 0.5);
+                    currentRoundMistakes = []; // 清空準備迎接下一輪可能再錯的
+                    currentQuestionIndex = 0;
+                } else {
+                    // 完美通關，進入撒花畫面！
+                    showCelebration();
+                    return;
+                }
             }
         }
         nextQuestion();
@@ -1119,7 +1177,8 @@
     function updateProgressText() {
         const progressEl = document.getElementById('unitProgress');
         if (progressEl) {
-            progressEl.innerText = `進度: ${currentQuestionIndex + 1} / ${playQueue.length}`;
+            let poolType = (currentRoundMistakes.length > 0 || playQueue.length < 50) && currentUnitIndex !== -2 ? '(錯題回顧) ' : '';
+            progressEl.innerText = `進度: ${poolType}${currentQuestionIndex + 1} / ${playQueue.length}`;
         }
     }
 
