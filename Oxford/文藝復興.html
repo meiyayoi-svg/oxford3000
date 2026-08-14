@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oxford English Dictionary - Ebbinghausian Rigour</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 換上復古深綠與暖金的古典配色 */
+            --oed-bg: #0c1a11; 
+            --oed-panel: rgba(12, 28, 17, 0.78);
+            --oed-panel-border: rgba(212, 175, 55, 0.25);
+            --oed-gold: #d4af37;
+            --oed-gold-hover: #f1c40f;
+            --oed-red: #a83232;
+            --oed-accent: #d4af37; /* 取代原本的科技藍，改用暖金色作為高光 */
+            --text-main: #fdfbf7; /* 米白色 */
+            --text-muted: #a3b8aa; /* 淺綠灰 */
+            --success-border: rgba(34, 197, 94, 0.4);
+            --success-bg: rgba(34, 197, 94, 0.15);
+            --danger-border: rgba(239, 68, 68, 0.4);
+            --danger-bg: rgba(239, 68, 68, 0.15);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--oed-bg);
+            /* 設置您指定的歷史建築圖片為背景 */
+            background-image: url('Augsburg_-_Platz_um_den_Merkurbrunnen.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 增添深綠色漸層遮罩，確保文字可讀性同時透出背景圖片 */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            background: linear-gradient(to bottom, rgba(12, 26, 17, 0.8), rgba(6, 15, 9, 0.9));
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 標頭區域 */
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .oed-brand {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .oed-logo {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: 6px;
+            color: var(--oed-gold); /* Logo 改為金色增添高貴感 */
+            font-family: "EB Garamond", serif;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .oed-divider {
+            width: 2px;
+            height: 28px;
+            background-color: var(--oed-red);
+        }
+
+        .oed-title {
+            font-size: 30px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            color: #ffffff;
+            font-family: "EB Garamond", serif;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 15px;
+            color: var(--oed-gold);
+            margin: 8px 0 0 0;
+            font-weight: 300;
+            font-family: "EB Garamond", serif;
+            letter-spacing: 0.8px;
+            font-style: italic;
+        }
+
+        /* 玻璃擬態高質感卡片容器 */
+        .glass-panel {
+            background: var(--oed-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--oed-panel-border);
+            border-radius: 8px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone {
+            border: 1px dashed rgba(212, 175, 55, 0.4);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--oed-accent);
+            background: rgba(212, 175, 55, 0.08);
+        }
+
+        .unit-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding: 16px 20px;
+        }
+
+        .unit-select {
+            padding: 8px 14px;
+            border-radius: 4px;
+            border: 1px solid var(--oed-panel-border);
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            outline: none;
+        }
+
+        .unit-select option {
+            background: #0a1a10; /* 選單底色改為深綠 */
+            color: #ffffff;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .toggle-label:hover {
+            border-color: var(--oed-accent);
+            color: #ffffff;
+        }
+
+        .mode-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--oed-panel-border);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: rgba(212, 175, 55, 0.15);
+            color: #ffffff;
+            border-color: var(--oed-accent);
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+        }
+
+        .dashboard {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+            margin-bottom: 20px;
+        }
+
+        .stat-val {
+            color: #ffffff;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .stat-btn {
+            cursor: pointer;
+            padding: 6px 14px;
+            border-radius: 4px;
+            background: rgba(168, 50, 50, 0.2);
+            border: 1px solid rgba(168, 50, 50, 0.4);
+            transition: all 0.2s;
+        }
+
+        .stat-btn:hover {
+            background: rgba(168, 50, 50, 0.35);
+        }
+
+        .quiz-card {
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .word-display {
+            font-size: 46px;
+            font-weight: 500;
+            color: #ffffff;
+            font-family: "EB Garamond", Georgia, serif;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .trans-display {
+            font-size: 24px;
+            font-weight: 400;
+            color: #ffffff;
+            font-family: "EB Garamond", serif;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .phonetic {
+            font-size: 16px;
+            color: var(--oed-accent);
+            margin-bottom: 20px;
+            font-family: "Inter", sans-serif;
+            font-weight: 300;
+        }
+
+        .sound-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 400;
+            margin-bottom: 28px;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .sound-btn:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--oed-accent);
+        }
+
+        .sound-btn.playing {
+            border-color: var(--oed-gold);
+            color: var(--oed-gold);
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .option-btn {
+            padding: 16px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1.5;
+            color: #e2e8f0;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--oed-accent);
+            transform: translateX(4px);
+        }
+
+        .option-btn.correct {
+            background: var(--success-bg) !important;
+            border-color: var(--success-border) !important;
+            color: #4ade80 !important;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-bg) !important;
+            border-color: var(--danger-border) !important;
+            color: #f87171 !important;
+        }
+
+        .feedback-banner {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 4px;
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .feedback-banner.correct-bg {
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: #4ade80;
+        }
+
+        .feedback-banner.wrong-bg {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: #f87171;
+        }
+
+        .next-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(212, 175, 55, 0.2);
+            color: #ffffff;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+
+        .next-btn:hover {
+            background: var(--oed-gold);
+            color: #0c1a11;
+        }
+
+        .flashcard {
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .trans-hidden {
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .btn-fail { 
+            background: rgba(239, 68, 68, 0.2); 
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+        .btn-fail:hover { background: rgba(239, 68, 68, 0.35); }
+
+        .btn-pass { 
+            background: rgba(34, 197, 94, 0.2); 
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #4ade80;
+        }
+        .btn-pass:hover { background: rgba(34, 197, 94, 0.35); }
+    </style>
+</head>
+<body>
+
+<!-- 畫面遮罩，確保文字能在實景圖上清晰可見 -->
+<div class="bg-overlay"></div>
+
+<div class="main-wrapper">
+    <header>
+        <div class="oed-brand">
+            <span class="oed-logo">O E D</span>
+            <div class="oed-divider"></div>
+            <span class="oed-title">Oxford English Dictionary</span>
+        </div>
+        <p class="hero-subtitle">The historical English dictionary · Ebbinghausian rigour</p>
+    </header>
+
+    <div class="glass-panel drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <span id="dropText" style="font-weight: 400; color: #ffffff; font-size: 15px; letter-spacing: 0.5px;">
+            📁 載入或拖曳 words.json 詞庫檔案以開啟特訓
+        </span>
+        <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFile(this.files[0])">
+    </div>
+
+    <div id="mainApp" style="display: none;">
+        <div class="glass-panel unit-bar">
+            <div>
+                <label for="unitSelect" style="font-size: 13px; color: var(--text-muted); margin-right: 8px;">單元範疇:</label>
+                <select id="unitSelect" class="unit-select" onchange="onUnitChange()"></select>
+            </div>
+
+            <div class="toggle-group">
+                <label class="toggle-label">
+                    <input type="checkbox" id="reverseCheck" onchange="toggleSetting()">
+                    <span>🔄 中 ➔ 英逆向</span>
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="shuffleCheck" onchange="toggleSetting()">
+                    <span>🔀 亂序模式</span>
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="cleanTransCheck" checked onchange="toggleSetting()">
+                    <span>📖 COD 精簡釋義</span>
+                </label>
+            </div>
+
+            <div style="font-size: 13px; color: var(--text-muted);" id="unitProgress">進度: 0 / 50</div>
+        </div>
+
+        <div class="mode-nav">
+            <button class="mode-btn active" id="btnModeQuiz" onclick="switchMode('quiz')">🎯 詞義辨析特訓</button>
+            <button class="mode-btn" id="btnModeCard" onclick="switchMode('card')">🎴 雙面卡片記憶</button>
+        </div>
+
+        <div class="glass-panel" style="padding: 28px;">
+            <div class="dashboard">
+                <div>已研習詞數: <span class="stat-val" id="statTotal">0</span></div>
+                <div>連續正確: <span class="stat-val" style="color: #4ade80;" id="statStreak">0</span></div>
+                <div class="stat-btn" onclick="startMistakeBook()" title="點擊檢視艾賓浩斯待複習詞彙">
+                    💔 生詞簿: <span class="stat-val" style="color: #f87171;" id="statMistakes">0</span>
+                    <span id="statDue" style="font-size:11px; color:var(--text-muted); display:block; text-align:center; margin-top:2px;">今日待複習: 0</span>
+                </div>
+            </div>
+
+            <div class="quiz-card" id="cardArea"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 艾賓浩斯記憶時間間隔 (毫秒)
+    const EBBINGHAUS_INTERVALS = [
+        0,                        
+        12 * 60 * 60 * 1000,      // 12小時
+        24 * 60 * 60 * 1000,      // 1天
+        2 * 24 * 60 * 60 * 1000,  // 2天
+        4 * 24 * 60 * 60 * 1000,  // 4天
+        7 * 24 * 60 * 60 * 1000,  // 7天
+        15 * 24 * 60 * 60 * 1000, // 15天
+        30 * 24 * 60 * 60 * 1000  // 30天
+    ];
+
+    // Web Audio API 高端學術微音效合成器 (Oxford Academic Chimes)
+    let audioCtx = null;
+    function getAudioCtx() {
+        if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        return audioCtx;
+    }
+
+    // 正確音效：典雅的水晶磬音 / 雙音清脆和弦 (E5 -> A5)
+    function playCorrectFx() {
+        try {
+            const ctx = getAudioCtx();
+            const now = ctx.currentTime;
+
+            // 第一音 E5 (659.25Hz)
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(659.25, now);
+            gain1.gain.setValueAtTime(0.08, now);
+            gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.6);
+
+            // 第二音 A5 (880.00Hz) - 延遲0.08秒觸發
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(880.00, now + 0.08);
+            gain2.gain.setValueAtTime(0.12, now + 0.08);
+            gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(now + 0.08);
+            osc2.stop(now + 0.8);
+        } catch(e) {}
+    }
+
+    // 錯誤音效：沉穩溫和的大提琴/木琴低音重音 (F3, 174.61Hz)，非打擊感，不刺耳
+    function playWrongFx() {
+        try {
+            const ctx = getAudioCtx();
+            const now = ctx.currentTime;
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle'; // 三角波，音色沉穩如大提琴
+            osc.frequency.setValueAtTime(174.61, now); 
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.5);
+        } catch(e) {}
+    }
+
+    let activeAudio = null;
+    let isAudioPlayingLoop = false;
+    let audioLoopCount = 0;
+
+    function stopAudioLoop() {
+        if (activeAudio) {
+            activeAudio.pause();
+            activeAudio.currentTime = 0;
+            activeAudio = null;
+        }
+        isAudioPlayingLoop = false;
+        audioLoopCount = 0;
+        updateSoundBtnState(false);
+    }
+
+    function playAudioContinuous(word, times = 5) {
+        stopAudioLoop();
+        if (!word) return;
+        isAudioPlayingLoop = true;
+        audioLoopCount = 0;
+        updateSoundBtnState(true);
+
+        function playOne() {
+            if (!isAudioPlayingLoop || audioLoopCount >= times) {
+                stopAudioLoop();
+                return;
+            }
+            activeAudio = new Audio(`https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`);
+            activeAudio.onended = () => {
+                audioLoopCount++;
+                if (isAudioPlayingLoop && audioLoopCount < times) {
+                    setTimeout(playOne, 400);
+                } else {
+                    stopAudioLoop();
+                }
+            };
+            activeAudio.play().catch(() => stopAudioLoop());
+        }
+        playOne();
+    }
+
+    function toggleAudio(word) {
+        if (isAudioPlayingLoop) stopAudioLoop();
+        else playAudioContinuous(word, 5);
+    }
+
+    function updateSoundBtnState(isPlaying) {
+        const btn = document.getElementById('soundBtn');
+        if (btn) {
+            if (isPlaying) {
+                btn.classList.add('playing');
+                btn.innerHTML = `🔊 連續朗讀中... (點擊停止)`;
+            } else {
+                btn.innerHTML = `🔊 播放標準發音 (連續5次)`;
+            }
+        }
+    }
+
+    let allWords = [];
+    let currentUnitWords = [];
+    let playQueue = [];
+    let unitSize = 50;
+    let currentUnitIndex = 0;
+    let currentQuestionIndex = 0;
+    let isShuffle = false;
+    let isCleanTrans = true;
+    let isReverseMode = false;
+    let currentMode = 'quiz';
+    let currentQuestion = null;
+    
+    let streakCount = 0;
+    let unitPracticedCount = 0;
+    let mistakeDict = {}; 
+
+    function saveState() {
+        const state = {
+            unitIdx: currentUnitIndex,
+            qIdx: currentQuestionIndex,
+            mode: currentMode,
+            mistakeDict: mistakeDict,
+            isShuffle, isReverseMode, isCleanTrans,
+            streak: streakCount,
+            totalPracticed: unitPracticedCount
+        };
+        localStorage.setItem('oed_app_state', JSON.stringify(state));
+    }
+
+    function loadState() {
+        const saved = localStorage.getItem('oed_app_state');
+        if (!saved) return;
+        try {
+            const s = JSON.parse(saved);
+            currentUnitIndex = s.unitIdx !== undefined ? s.unitIdx : 0;
+            currentQuestionIndex = s.qIdx !== undefined ? s.qIdx : 0;
+            currentMode = s.mode || 'quiz';
+            
+            let oldMistakes = s.mistakes || []; 
+            let newDict = s.mistakeDict || {};
+            if (Array.isArray(oldMistakes) && oldMistakes.length > 0 && Object.keys(newDict).length === 0) {
+                oldMistakes.forEach(str => {
+                    let obj = JSON.parse(str);
+                    newDict[obj.word] = { wordObj: obj, level: 0, nextReview: Date.now() };
+                });
+            }
+            mistakeDict = newDict;
+
+            isShuffle = !!s.isShuffle;
+            isReverseMode = !!s.isReverseMode;
+            isCleanTrans = s.isCleanTrans !== undefined ? s.isCleanTrans : true;
+            streakCount = s.streak || 0;
+            unitPracticedCount = s.totalPracticed || 0;
+
+            document.getElementById('shuffleCheck').checked = isShuffle;
+            document.getElementById('reverseCheck').checked = isReverseMode;
+            document.getElementById('cleanTransCheck').checked = isCleanTrans;
+            
+            document.getElementById('btnModeQuiz').classList.toggle('active', currentMode === 'quiz');
+            document.getElementById('btnModeCard').classList.toggle('active', currentMode === 'card');
+        } catch(e) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedWords = localStorage.getItem('oed_app_words');
+        if (savedWords) {
+            try {
+                allWords = JSON.parse(savedWords).filter(w => w && w.word && w.translation);
+                if (allWords.length > 0) {
+                    loadState();
+                    initAppUI();
+                    return;
+                }
+            } catch(e){}
+        }
+        fetch('words.json').then(res => res.json()).then(data => {
+            allWords = (data || []).filter(w => w && w.word && w.translation);
+            localStorage.setItem('oed_app_words', JSON.stringify(allWords));
+            loadState();
+            initAppUI();
+        }).catch(() => {});
+    });
+
+    function handleFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const data = JSON.parse(e.target.result);
+                allWords = (data || []).filter(w => w && w.word && w.translation);
+                localStorage.setItem('oed_app_words', JSON.stringify(allWords));
+                currentUnitIndex = 0;
+                currentQuestionIndex = 0;
+                initAppUI();
+            } catch (err) { alert("JSON 格式解析錯誤"); }
+        };
+        reader.readAsText(file);
+    }
+
+    function getCleanTranslation(text) {
+        if (!text) return '';
+        if (!isCleanTrans) return text;
+        let parts = text.split(/；|;|\n/);
+        let trimmed = parts.slice(0, 2).join('；');
+        return trimmed.length > 24 ? trimmed.substring(0, 24) + '...' : trimmed;
+    }
+
+    function initAppUI() {
+        if (allWords.length === 0) return;
+        document.getElementById('dropZone').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+
+        const select = document.getElementById('unitSelect');
+        select.innerHTML = '';
+        
+        const totalUnits = Math.ceil(allWords.length / unitSize);
+        for (let i = 0; i < totalUnits; i++) {
+            const start = i * unitSize + 1;
+            const end = Math.min((i + 1) * unitSize, allWords.length);
+            select.add(new Option(`Unit ${i + 1} (${start}-${end})`, i));
+        }
+
+        select.add(new Option(`🔥 全詞庫隨機特訓 (${allWords.length} 詞)`, -1));
+        
+        const mistakeOpt = new Option(`💔 生詞簿`, -2);
+        mistakeOpt.id = 'mistakeOptionText';
+        select.add(mistakeOpt);
+
+        if (currentUnitIndex >= totalUnits && currentUnitIndex !== -1 && currentUnitIndex !== -2) {
+            currentUnitIndex = 0;
+        }
+        select.value = currentUnitIndex;
+        loadUnit(currentUnitIndex);
+    }
+
+    function startMistakeBook() {
+        let now = Date.now();
+        let allMistakes = Object.values(mistakeDict);
+        let dueMistakes = allMistakes.filter(m => m.nextReview <= now);
+
+        if (allMistakes.length === 0) {
+            alert("👏 目前尚無生詞，請繼續保持。");
+            return;
+        }
+        if (dueMistakes.length === 0) {
+            alert(`🎉 今日複習任務已完成！\n（尚有 ${allMistakes.length} 個詞彙於記憶週期中，明日請繼續。）`);
+            return;
+        }
+        document.getElementById('unitSelect').value = -2;
+        onUnitChange();
+    }
+
+    function toggleSetting() {
+        isShuffle = document.getElementById('shuffleCheck').checked;
+        isReverseMode = document.getElementById('reverseCheck').checked;
+        isCleanTrans = document.getElementById('cleanTransCheck').checked;
+        resetUnitQueue();
+        nextQuestion();
+        saveState();
+    }
+
+    function onUnitChange() {
+        const val = parseInt(document.getElementById('unitSelect').value);
+        currentQuestionIndex = 0;
+        loadUnit(val);
+        saveState();
+    }
+
+    function loadUnit(unitIdx) {
+        currentUnitIndex = parseInt(unitIdx);
+        if (currentUnitIndex === -1) {
+            currentUnitWords = [...allWords];
+        } else if (currentUnitIndex === -2) {
+            let now = Date.now();
+            let allMistakes = Object.values(mistakeDict);
+            let dueMistakes = allMistakes.filter(m => m.nextReview <= now);
+            
+            if (allMistakes.length === 0 || dueMistakes.length === 0) {
+                alert("無待複習生詞，已自動切換至 Unit 1。");
+                document.getElementById('unitSelect').value = 0;
+                currentUnitIndex = 0;
+                currentUnitWords = allWords.slice(0, unitSize);
+            } else {
+                currentUnitWords = dueMistakes.map(m => m.wordObj);
+            }
+        } else {
+            const start = currentUnitIndex * unitSize;
+            currentUnitWords = allWords.slice(start, start + unitSize);
+        }
+
+        resetUnitQueue();
+        updateStats();
+        nextQuestion();
+    }
+
+    function resetUnitQueue() {
+        if (isShuffle) {
+            playQueue = [...currentUnitWords].sort(() => Math.random() - 0.5);
+        } else {
+            playQueue = [...currentUnitWords];
+        }
+        if (currentQuestionIndex >= playQueue.length) currentQuestionIndex = 0;
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        document.getElementById('btnModeQuiz').classList.toggle('active', mode === 'quiz');
+        document.getElementById('btnModeCard').classList.toggle('active', mode === 'card');
+        nextQuestion();
+        saveState();
+    }
+
+    function nextQuestion() {
+        stopAudioLoop();
+        if (playQueue.length === 0) {
+            document.getElementById('cardArea').innerHTML = `
+                <div style="padding: 40px; font-size: 18px; color: #4ade80;">
+                    🎉 當前單元之詞彙已完成研習。
+                </div>
+            `;
+            return;
+        }
+
+        let wordObj = playQueue[currentQuestionIndex % playQueue.length];
+        let distractors = [];
+        while (distractors.length < 3) {
+            let rand = allWords[Math.floor(Math.random() * allWords.length)];
+            if (rand.word !== wordObj.word && !distractors.some(d => d.word === rand.word)) {
+                distractors.push(rand);
+            }
+        }
+
+        let rawOptions = [wordObj, ...distractors].sort(() => Math.random() - 0.5);
+        currentQuestion = {
+            wordObj: wordObj,
+            options: rawOptions,
+            correctIndex: rawOptions.findIndex(o => o.word === wordObj.word)
+        };
+
+        if (currentMode === 'quiz') renderQuizMode();
+        else renderCardMode();
+
+        playAudioContinuous(wordObj.word, 5);
+        saveState();
+    }
+
+    function renderQuizMode() {
+        const area = document.getElementById('cardArea');
+        const q = currentQuestion;
+        const optionLetters = ['A', 'B', 'C', 'D'];
+
+        let html = '';
+        if (!isReverseMode) {
+            html += `<div class="word-display">${escapeHtml(q.wordObj.word)}</div>
+                     <div class="phonetic">${escapeHtml(q.wordObj.phonetic || '')}</div>`;
+        } else {
+            html += `<div style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">請選擇對應之英文單詞：</div>
+                     <div class="trans-display">${escapeHtml(getCleanTranslation(q.wordObj.translation))}</div>`;
+        }
+        
+        html += `<button class="sound-btn" id="soundBtn" onclick="toggleAudio('${escapeJs(q.wordObj.word)}')">🔊 播放標準發音 (連續5次)</button>
+                 <div class="options-grid">`;
+
+        q.options.forEach((opt, idx) => {
+            if (!isReverseMode) {
+                html += `<button class="option-btn" id="optBtn_${idx}" onclick="checkAnswer(${idx})">
+                            <strong style="color:var(--oed-accent); font-family:'EB Garamond',serif; margin-right:6px;">${optionLetters[idx]}.</strong> ${escapeHtml(getCleanTranslation(opt.translation))}
+                         </button>`;
+            } else {
+                html += `<button class="option-btn" id="optBtn_${idx}" onclick="checkAnswer(${idx})">
+                            <strong style="color:var(--oed-accent); font-family:'EB Garamond',serif; margin-right:6px;">${optionLetters[idx]}.</strong> 
+                            <span style="font-family:'EB Garamond',serif; font-size:20px; color:#ffffff;">${escapeHtml(opt.word)}</span>
+                            <span style="color:var(--text-muted); font-size:13px; margin-left:10px;">${escapeHtml(opt.phonetic || '')}</span>
+                         </button>`;
+            }
+        });
+
+        html += `</div>
+                 <div class="feedback-banner" id="feedbackBanner"></div>
+                 <div id="nextArea" style="display:none;">
+                     <button class="next-btn" onclick="onNextClick()">下一題 ➔</button>
+                 </div>`;
+        
+        area.innerHTML = html;
+        updateProgressText();
+    }
+
+    function handleEbbinghausResult(wordObj, isCorrect) {
+        if (isCorrect) {
+            streakCount++;
+            if (mistakeDict[wordObj.word]) {
+                mistakeDict[wordObj.word].level++;
+                let newLevel = mistakeDict[wordObj.word].level;
+                
+                if (newLevel >= EBBINGHAUS_INTERVALS.length) {
+                    delete mistakeDict[wordObj.word];
+                } else {
+                    mistakeDict[wordObj.word].nextReview = Date.now() + EBBINGHAUS_INTERVALS[newLevel];
+                }
+            }
+        } else {
+            streakCount = 0;
+            if (mistakeDict[wordObj.word]) {
+                mistakeDict[wordObj.word].level = 0;
+                mistakeDict[wordObj.word].nextReview = Date.now();
+            } else {
+                mistakeDict[wordObj.word] = {
+                    wordObj: wordObj,
+                    level: 0,
+                    nextReview: Date.now()
+                };
+            }
+        }
+    }
+
+    function checkAnswer(selectedIdx) {
+        stopAudioLoop();
+        const q = currentQuestion;
+        const banner = document.getElementById('feedbackBanner');
+        const nextArea = document.getElementById('nextArea');
+
+        q.options.forEach((_, idx) => document.getElementById(`optBtn_${idx}`).disabled = true);
+        unitPracticedCount++;
+        
+        if (selectedIdx === q.correctIndex) {
+            playCorrectFx(); 
+            document.getElementById(`optBtn_${q.correctIndex}`).classList.add('correct');
+            handleEbbinghausResult(q.wordObj, true);
+
+            banner.className = 'feedback-banner correct-bg';
+            banner.style.display = 'block';
+            banner.innerHTML = `
+                <div style="font-weight:600; margin-bottom:2px;">✅ 回答正確</div>
+                <div><b>${escapeHtml(q.wordObj.word)}</b> ${escapeHtml(q.wordObj.phonetic || '')}：${escapeHtml(q.wordObj.translation)}</div>
+            `;
+        } else {
+            playWrongFx(); 
+            document.getElementById(`optBtn_${selectedIdx}`).classList.add('wrong');
+            document.getElementById(`optBtn_${q.correctIndex}`).classList.add('correct');
+
+            handleEbbinghausResult(q.wordObj, false);
+
+            banner.className = 'feedback-banner wrong-bg';
+            banner.style.display = 'block';
+            banner.innerHTML = `
+                <div style="font-weight:600; margin-bottom:2px;">❌ 回答錯誤</div>
+                <div><b>正確答案：</b> ${escapeHtml(q.wordObj.word)} ${escapeHtml(q.wordObj.phonetic || '')} ➔ ${escapeHtml(q.wordObj.translation)}</div>
+            `;
+        }
+
+        updateStats();
+        nextArea.style.display = 'block';
+        saveState();
+    }
+
+    function onNextClick() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex >= playQueue.length) {
+            if (currentUnitIndex === -2) {
+                loadUnit(-2);
+                return;
+            } else {
+                resetUnitQueue();
+            }
+        }
+        nextQuestion();
+    }
+
+    function renderCardMode() {
+        const area = document.getElementById('cardArea');
+        const q = currentQuestion;
+        let html = `<div class="flashcard" id="frontCard" onclick="flipCard()">`;
+        
+        if (!isReverseMode) {
+            html += `<div class="word-display">${escapeHtml(q.wordObj.word)}</div>
+                     <div class="phonetic">${escapeHtml(q.wordObj.phonetic || '')}</div>
+                     <button class="sound-btn" id="soundBtn" onclick="event.stopPropagation(); toggleAudio('${escapeJs(q.wordObj.word)}')">🔊 播放發音</button>
+                     <div class="trans-hidden" id="cardTrans">點擊卡片翻面，檢視釋義</div>`;
+        } else {
+            html += `<div style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">請回想對應之英文單詞：</div>
+                     <div class="trans-display">${escapeHtml(getCleanTranslation(q.wordObj.translation))}</div>
+                     <button class="sound-btn" id="soundBtn" onclick="event.stopPropagation(); toggleAudio('${escapeJs(q.wordObj.word)}')">🔊 播放發音</button>
+                     <div class="trans-hidden" id="cardTrans">點擊卡片翻面，檢視單詞</div>`;
+        }
+
+        html += `</div>
+                 <div class="action-btns" id="cardActions" style="display:none;">
+                     <button class="action-btn btn-fail" onclick="markCard(false)">❌ 尚未掌握</button>
+                     <button class="action-btn btn-pass" onclick="markCard(true)">✅ 完整記憶</button>
+                 </div>`;
+        
+        area.innerHTML = html;
+        updateProgressText();
+        playAudioContinuous(q.wordObj.word, 5);
+    }
+
+    function flipCard() {
+        const transEl = document.getElementById('cardTrans');
+        const q = currentQuestion;
+        
+        if (!isReverseMode) {
+            transEl.className = 'trans';
+            transEl.style.fontSize = '20px';
+            transEl.style.color = '#ffffff';
+            transEl.style.fontFamily = '"EB Garamond", serif';
+            transEl.innerText = getCleanTranslation(q.wordObj.translation);
+        } else {
+            transEl.className = 'trans';
+            transEl.style.fontSize = '26px';
+            transEl.style.color = '#ffffff';
+            transEl.style.fontFamily = '"EB Garamond", serif';
+            transEl.innerHTML = `${escapeHtml(q.wordObj.word)} <span style="font-size:15px; color:var(--oed-accent); font-family:sans-serif;">${escapeHtml(q.wordObj.phonetic || '')}</span>`;
+        }
+        
+        document.getElementById('cardActions').style.display = 'flex';
+        document.getElementById('frontCard').onclick = null; 
+    }
+
+    function markCard(isRemembered) {
+        stopAudioLoop();
+        unitPracticedCount++;
+        const q = currentQuestion;
+
+        if (isRemembered) {
+            playCorrectFx();
+            handleEbbinghausResult(q.wordObj, true);
+        } else {
+            playWrongFx();
+            handleEbbinghausResult(q.wordObj, false);
+        }
+
+        updateStats();
+        saveState();
+        onNextClick();
+    }
+
+    function updateStats() {
+        document.getElementById('statTotal').innerText = unitPracticedCount;
+        document.getElementById('statStreak').innerText = streakCount;
+        
+        let now = Date.now();
+        let allMistakes = Object.values(mistakeDict);
+        let dueCount = allMistakes.filter(m => m.nextReview <= now).length;
+
+        document.getElementById('statMistakes').innerText = allMistakes.length;
+        
+        const dueEl = document.getElementById('statDue');
+        if (dueCount > 0) {
+            dueEl.innerText = `今日待複習: ${dueCount}`;
+            dueEl.style.color = '#f87171';
+            dueEl.style.fontWeight = 'bold';
+        } else {
+            dueEl.innerText = `今日待複習: 0`;
+            dueEl.style.color = 'var(--text-muted)';
+            dueEl.style.fontWeight = 'normal';
+        }
+
+        const mistakeOpt = document.getElementById('mistakeOptionText');
+        if (mistakeOpt) {
+            mistakeOpt.innerText = `💔 生詞簿 (${allMistakes.length} 詞)`;
+        }
+    }
+
+    function updateProgressText() {
+        const progressEl = document.getElementById('unitProgress');
+        if (progressEl) {
+            progressEl.innerText = `進度: ${currentQuestionIndex + 1} / ${playQueue.length}`;
+        }
+    }
+
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function escapeJs(unsafe) {
+         if (!unsafe) return '';
+         return unsafe.toString().replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+</script>
+</body>
+</html>
